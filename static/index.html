@@ -1,0 +1,77 @@
+<script src="/socket.io/socket.io.js"></script>
+<canvas></canvas>
+<meta name="viewport" content="width=device-width,user-scalable=no">
+<script>
+  var specialstatus = "";
+  var socket = io();
+  var canvas = document.querySelector('canvas');
+  var c = canvas.getContext("2d");
+  var playerdata = {};
+
+addEventListener('mousemove', event => {
+	mouse.x = event.clientX;
+  mouse.y = event.clientY;
+  
+  socket.emit("player move",{x:mouse.x,y:mouse.y});
+});
+
+
+addEventListener('touchmove', event => {
+	mouse.x = event.clientX;
+  mouse.y = event.clientY;
+  
+  socket.emit("player move",{x:mouse.x,y:mouse.y});
+});
+socket.on("player size", function(size){
+  if (!playerdata[size.playerid]) playerdata[size.playerid] = {};
+playerdata[size.playerid].size = size.size;
+console.log(size.playerid+"'s size changed to "+size.size);
+});
+
+socket.on("delete player",function(playeridx){
+delete playerdata[playeridx];
+});
+
+socket.on("you died",function(){
+canvas.remove();
+document.write("<h1> you died! </h1>");
+});
+
+socket.on("special status",function(newval){
+specialstatus=newval;
+});
+
+socket.on("player move",function(location){
+if (!playerdata[location.playerid]) playerdata[location.playerid] = {};
+var p = playerdata[location.playerid];
+p.x = location.x;
+p.y = location.y;
+});
+var mouse = {
+	x: innerWidth / 2,
+	y: innerHeight / 2
+};
+
+function drawCircleAt(x,y,size,color){
+  c.beginPath();
+		c.arc(x, y, size, 0, Math.PI * 2, false);	
+		c.fillStyle = color;
+		c.fill();
+		c.closePath();
+}
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+function animate(){
+  requestAnimationFrame(animate);
+  c.clearRect(0,0,innerWidth,innerHeight);
+  Object.keys(playerdata).forEach(function(pde) {
+    drawCircleAt(playerdata[pde].x,playerdata[pde].y,playerdata[pde].size,"black");
+
+});
+
+
+
+c.fillText(specialstatus,100,100);
+}
+animate();
+</script>

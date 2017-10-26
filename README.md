@@ -1,2 +1,4 @@
 # iortcme
-Small &amp; Crappy Multiplayer Node.js game using socket.io.
+
+## What is IORTCME?
+IORTCME is a random Node.js multiplayer web-game, made with Socket.io... just an experiment! :D
